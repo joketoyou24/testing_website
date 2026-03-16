@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI PEKA - UPTD PPA Makassar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --bg-main: #f8fafc;
+            --primary: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: #1e293b;
+        }
+
+        .glass-card {
+            background: white;
+            border: 2px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .card-pulse-green { border: 2.5px solid var(--success) !important; animation: pulse-green-frame 2s infinite; }
+        .card-pulse-amber { border: 2.5px solid var(--warning) !important; animation: pulse-amber-frame 2s infinite; }
+        .card-pulse-red { border: 2.5px solid var(--danger) !important; animation: pulse-red-frame 1.5s infinite; }
+
+        @keyframes pulse-green-frame { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes pulse-amber-frame { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        @keyframes pulse-red-frame { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        .tooltip-container { position: relative; cursor: help; }
+        .tooltip-text {
+            visibility: hidden; width: 240px; background-color: #1e293b; color: #fff;
+            text-align: left; border-radius: 12px; padding: 14px; position: absolute;
+            z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%);
+            opacity: 0; transition: opacity 0.3s; font-size: 10px; line-height: 1.5;
+            font-weight: 500; pointer-events: none; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .tooltip-text b { color: #818cf8; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tooltip-text .label { color: #94a3b8; font-weight: 700; margin-top: 8px; display: block; border-top: 1px solid #334155; padding-top: 8px; }
+        .tooltip-text .desc { color: #cbd5e1; display: block; margin-top: 2px; }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+        .thought-container { position: absolute; top: -28px; left: 45px; z-index: 30; }
+        .thought-bubble {
+            background: #1e293b; color: white; padding: 6px 14px;
+            border-radius: 12px; font-size: 10px; font-weight: 700;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); position: relative;
+            white-space: nowrap;
+        }
+        .thought-bubble::after { content: ''; position: absolute; background: #1e293b; border-radius: 50%; width: 6px; height: 6px; bottom: -8px; left: 12px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-6">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-2xl rotate-3">
+                        <i class="fa-solid fa-notes-medical text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">SI PEKA <span class="text-indigo-600">UPTD PPA</span></h1>
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Monitoring Pendamping Kasus • Makassar</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col bg-white border border-slate-200 rounded-2xl p-2 px-4 shadow-sm">
+                    <label class="text-[8px] font-black text-slate-400 uppercase mb-1">Pilih Tanggal Data</label>
+                    <input type="date" id="data-date" onchange="handleDateChange()" class="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer">
+                </div>
+            </div>
+
+            <nav class="flex p-1.5 bg-slate-200/50 rounded-[1.5rem] backdrop-blur-sm">
+                <button onclick="showTab('dashboard')" id="btn-dashboard" class="nav-btn nav-active px-8 py-3 rounded-2xl text-[11px] font-black transition-all">DASHBOARD</button>
+                <button onclick="showTab('statistik')" id="btn-statistik" class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">STATISTIK</button>
+                <button onclick="showTab('admin')" id="btn-admin" class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">EKSPOR</button>
+            </nav>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <main id="dashboard" class="tab-content active">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Total Pendamping</p>
+                    <p id="count-total" class="text-3xl font-black text-slate-800 tracking-tighter">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-green-500">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Aman</p>
+                    <p id="count-aman" class="text-3xl font-black text-green-600 tracking-tighter">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-amber-500">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Waspada</p>
+                    <p id="count-waspada" class="text-3xl font-black text-amber-600 tracking-tighter">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-red-500">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Kritis</p>
+                    <p id="count-kritis" class="text-3xl font-black text-red-600 tracking-tighter">0</p>
+                </div>
+            </div>
+
+            <div id="loading-view" class="hidden flex flex-col items-center justify-center py-20 text-slate-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4"></i>
+                <p class="text-xs font-black uppercase tracking-widest">Sinkronisasi Data History...</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="officer-grid"></div>
+        </main>
+
+        <section id="statistik" class="tab-content"></section>
+        <section id="admin" class="tab-content"></section>
+    </div>
+
+    <script>
+        document.getElementById('data-date').valueAsDate = new Date();
+
+        const getIntegrasiScore = (p) => (p.wl * 1.2) + (p.bo + p.sts);
+        const getKategori = (score) => (score > 40 ? "tinggi" : score > 20 ? "sedang" : "rendah");
+        const getProQOLCat = (val) => (val >= 11 ? "Tinggi" : val >= 6 ? "Sedang" : "Rendah");
+        const getStatusText = (cat) => (cat === "tinggi" ? "Perlu Atensi 🆘" : cat === "sedang" ? "Cukup Sibuk ☕" : "Aman ji ✨");
+
+        let currentData = [];
+
+        function generateMockData() {
+            const raw = [
+                { n: "Siti Aminah", r: "Psikolog", wl: 12, cs: 14, bo: 2, sts: 1, act: 4, term: 15 },
+                { n: "Andi Wijaya", r: "Konselor Hukum", wl: 42, cs: 5, bo: 12, sts: 11, act: 11, term: 9 },
+                { n: "Budi Santoso", r: "Pekerja Sosial", wl: 28, cs: 9, bo: 7, sts: 6, act: 7, term: 21 },
+                { n: "Dewi Lestari", r: "Psikolog Klinis", wl: 8, cs: 15, bo: 1, sts: 1, act: 2, term: 38 }
+            ];
+            for(let i=5; i<=20; i++) {
+                raw.push({
+                    n: `Pendamping ${i}`,
+                    r: i % 2 === 0 ? "Psikolog" : "Pekerja Sosial",
+                    wl: Math.floor(Math.random() * 35) + 5,
+                    cs: Math.floor(Math.random() * 10) + 5,
+                    bo: Math.floor(Math.random() * 9) + 2,
+                    sts: Math.floor(Math.random() * 9) + 1,
+                    act: Math.floor(Math.random() * 8) + 1,
+                    term: Math.floor(Math.random() * 40) + 10
+                });
+            }
+            currentData = raw.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
+            updateSummary();
+            renderCards();
+        }
+
+        function updateSummary() {
+            const counts = { total: currentData.length, aman: 0, waspada: 0, kritis: 0 };
+            currentData.forEach(p => {
+                const cat = getKategori(getIntegrasiScore(p));
+                if (cat === 'rendah') counts.aman++;
+                else if (cat === 'sedang') counts.waspada++;
+                else counts.kritis++;
+            });
+            document.getElementById('count-total').innerText = counts.total;
+            document.getElementById('count-aman').innerText = counts.aman;
+            document.getElementById('count-waspada').innerText = counts.waspada;
+            document.getElementById('count-kritis').innerText = counts.kritis;
+        }
+
+        function handleDateChange() {
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
+            grid.classList.add('hidden');
+            loading.classList.remove('hidden');
+            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('officer-grid');
+            grid.innerHTML = currentData.map(p => {
+                const totalSkor = getIntegrasiScore(p);
+                const kategori = getKategori(totalSkor);
+                const pulseClass = kategori === 'tinggi' ? 'card-pulse-red' : kategori === 'sedang' ? 'card-pulse-amber' : 'card-pulse-green';
+                const catLabelClass = kategori === 'tinggi' ? 'bg-red-100 text-red-600' : kategori === 'sedang' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600';
+
+                return `
+                <div class="glass-card rounded-[3rem] p-7 flex flex-col h-full ${pulseClass}">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="relative">
+                            <div class="w-16 h-16 rounded-[1.8rem] bg-slate-100 overflow-hidden border-2 border-white shadow-sm">
+                                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${p.n}">
+                            </div>
+                            <div class="thought-container">
+                                <div class="thought-bubble" style="${kategori === 'tinggi' ? 'background: #ef4444;' : ''}">
+                                    ${getStatusText(kategori)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="tooltip-container">
+                                <span class="text-[8px] font-black text-slate-300 uppercase tracking-widest border-b border-dotted border-slate-300">Total Skor</span>
+                                <div class="tooltip-text">
+                                    <b>Total Skor Integrasi</b>
+                                    Penjelasan total skor itu integrasi well-being check in dan beban kerja aktif petugas pendamping kasus.
+                                </div>
+                            </div>
+                            <p class="text-2xl font-black ${kategori === 'tinggi' ? 'text-red-600' : 'text-slate-800'}">${totalSkor.toFixed(0)}</p>
+                            <div class="inline-block text-[8px] font-black px-2 py-0.5 rounded-full ${catLabelClass} uppercase mt-1">${kategori}</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="font-extrabold text-[14px] text-slate-800 leading-tight">${p.n}</h4>
+                        <p class="text-[9px] text-slate-400 font-black tracking-widest uppercase mt-1">${p.r}</p>
+                    </div>
+
+                    <!-- WELL-BEING SECTION -->
+                    <div class="mb-5">
+                        <div class="tooltip-container flex items-center gap-1.5 mb-2">
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200">Well-being Check-in</p>
+                            <div class="tooltip-text">
+                                <b>Well-being Check-in</b>
+                                Instrumen harian berbasis ProQOL untuk memantau kualitas hidup profesional pendamping dalam melayani korban.
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
+                                <p class="text-[7px] font-black text-slate-400 uppercase">CS</p>
+                                <p class="text-[12px] font-black text-slate-600">${p.cs}</p>
+                                <div class="tooltip-text">
+                                    <b>Compassion Satisfaction</b>
+                                    Kepuasan yang berasal dari kemampuan memberikan bantuan secara efektif kepada orang lain.
+                                    <span class="label">SKOR ${p.cs}: ${getProQOLCat(p.cs)}</span>
+                                    <span class="desc">Interpretasi: Menunjukkan kepuasan profesional dan efikasi diri yang baik dalam pekerjaan pendampingan.</span>
+                                </div>
+                            </div>
+                            <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
+                                <p class="text-[7px] font-black text-slate-400 uppercase">BO</p>
+                                <p class="text-[12px] font-black text-slate-600">${p.bo}</p>
+                                <div class="tooltip-text">
+                                    <b>Burnout</b>
+                                    Kelelahan emosional dan fisik yang terkait dengan beban kerja dan lingkungan kerja yang dirasakan tidak efektif.
+                                    <span class="label">SKOR ${p.bo}: ${getProQOLCat(p.bo)}</span>
+                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan risiko kelelahan dan penurunan motivasi kerja.</span>
+                                </div>
+                            </div>
+                            <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
+                                <p class="text-[7px] font-black text-slate-400 uppercase">STS</p>
+                                <p class="text-[12px] font-black text-slate-600">${p.sts}</p>
+                                <div class="tooltip-text">
+                                    <b>Secondary Traumatic Stress</b>
+                                    Ketegangan emosional akibat terpapar secara sekunder terhadap kejadian traumatis yang dialami oleh korban.
+                                    <span class="label">SKOR ${p.sts}: ${getProQOLCat(p.sts)}</span>
+                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan dampak psikologis akibat mendengarkan/menangani kisah trauma korban.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WORKLOAD SECTION -->
+                    <div class="mt-auto pt-5 border-t border-slate-50">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="tooltip-container">
+                                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200 inline-block">Beban Kerja Aktif</p>
+                                <div class="tooltip-text">
+                                    <b>Beban Kerja Aktif</b>
+                                    Penghitungan beban kerja berdasarkan 3 kriteria penilaian: Jenis Kasus, Kategori Kedalaman Layanan, dan Tingkat Risiko Kasus.
+                                </div>
+                            </div>
+                            <p class="text-xl font-black text-indigo-600 leading-none">${p.wl}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <div class="bg-indigo-50/50 p-2 rounded-xl text-center">
+                                <p class="text-[7px] font-bold text-indigo-400 uppercase">Kasus Aktif</p>
+                                <p class="text-xs font-black text-indigo-700">${p.act}</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-xl text-center">
+                                <p class="text-[7px] font-bold text-slate-400 uppercase">Terminasi</p>
+                                <p class="text-xs font-black text-slate-700">${p.term}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function showTab(t) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active', 'text-slate-500'));
+            document.getElementById(t).classList.add('active');
+            document.getElementById('btn-'+t).classList.add('nav-active');
+        }
+
+        window.onload = generateMockData;
+    </script>
+</body>
+</html>
