@@ -200,6 +200,10 @@
     </div>
 
     <script>
+        // --- KONFIGURASI API ---
+        const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwUuTTpor5mD1UXcCPEbNhHm1ahRGHU78GVfPxIQbpdQdiGM8vde4F96wBM5nUv3__e/exec';
+        // -----------------------
+
         document.getElementById('data-date').valueAsDate = new Date();
 
         const getIntegrasiScore = (p) => (p.wl * 1.2) + (p.bo + p.sts);
@@ -207,35 +211,70 @@
         const getProQOLCat = (val) => (val >= 11 ? "Tinggi" : val >= 6 ? "Sedang" : "Rendah");
         const getStatusText = (cat) => (cat === "tinggi" ? "Perlu Atensi 🆘" : cat === "sedang" ? "Cukup Sibuk ☕" : "Aman ji ✨");
 
+        let allData = [];
         let currentData = [];
         let myCharts = [];
 
-        function generateMockData() {
-            const raw = [
-                { n: "Siti Aminah", r: "Psikolog", wl: 12, cs: 14, bo: 2, sts: 1, act: 4, term: 15 },
-                { n: "Andi Wijaya", r: "Konselor Hukum", wl: 42, cs: 5, bo: 12, sts: 11, act: 11, term: 9 },
-                { n: "Budi Santoso", r: "Pekerja Sosial", wl: 28, cs: 9, bo: 7, sts: 6, act: 7, term: 21 },
-                { n: "Dewi Lestari", r: "Psikolog Klinis", wl: 8, cs: 15, bo: 1, sts: 1, act: 2, term: 38 }
-            ];
-            for(let i=5; i<=20; i++) {
-                raw.push({
-                    n: `Pendamping ${i}`,
-                    r: i % 2 === 0 ? "Psikolog" : "Pekerja Sosial",
-                    wl: Math.floor(Math.random() * 35) + 5,
-                    cs: Math.floor(Math.random() * 10) + 5,
-                    bo: Math.floor(Math.random() * 9) + 2,
-                    sts: Math.floor(Math.random() * 9) + 1,
-                    act: Math.floor(Math.random() * 8) + 1,
-                    term: Math.floor(Math.random() * 40) + 10
-                });
-            }
+        async function fetchSpreadsheetData() {
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
             
-            // FITUR URUTAN: Mengurutkan dari skor terendah (hijau) ke tertinggi (merah)
-            currentData = raw.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
+            grid.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            try {
+                const response = await fetch(SPREADSHEET_API_URL);
+                if (!response.ok) throw new Error("Gagal terhubung ke API");
+                
+                allData = await response.json();
+                processFilteredData(); // Langsung filter setelah data didapat
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Gagal mengambil data dari Spreadsheet. Pastikan URL API sudah benar.");
+                loading.classList.add('hidden');
+            }
+        }
+
+        function processFilteredData() {
+            const selectedDate = document.getElementById('data-date').value;
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
+            
+            // FILTER DIPERBAIKI: Memotong string tanggal API untuk mengambil bagian YYYY-MM-DD saja
+            let filtered = allData.filter(item => {
+                if (!item.tanggal) return false;
+                
+                // Mengubah "2026-03-09T05:11:17.000Z" menjadi "2026-03-09"
+                const itemDateOnly = item.tanggal.substring(0, 10);
+                return itemDateOnly === selectedDate;
+            });
+            
+            // Urutkan dari skor terendah (hijau) ke tertinggi (merah)
+            currentData = filtered.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
             
             updateSummary();
             renderCards();
-            initCharts();
+            
+            // Update chart jika tab statistik sedang aktif
+            if (document.getElementById('statistik').classList.contains('active')) {
+                initCharts();
+            }
+            
+            loading.classList.add('hidden');
+            grid.classList.remove('hidden');
+        }
+
+        function handleDateChange() {
+            // Ketika kalender diganti, langsung proses ulang data yang sudah di-fetch
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
+            
+            grid.classList.add('hidden');
+            loading.classList.remove('hidden');
+            
+            setTimeout(() => {
+                processFilteredData();
+            }, 300); // Sedikit delay agar animasi loading terlihat natural
         }
 
         function updateSummary() {
@@ -252,16 +291,14 @@
             document.getElementById('count-kritis').innerText = counts.kritis;
         }
 
-        function handleDateChange() {
-            const grid = document.getElementById('officer-grid');
-            const loading = document.getElementById('loading-view');
-            grid.classList.add('hidden');
-            loading.classList.remove('hidden');
-            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
-        }
-
         function renderCards() {
             const grid = document.getElementById('officer-grid');
+            
+            if (currentData.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 font-bold">Tidak ada data untuk tanggal ini.</div>`;
+                return;
+            }
+
             grid.innerHTML = currentData.map(p => {
                 const totalSkor = getIntegrasiScore(p);
                 const kategori = getKategori(totalSkor);
@@ -371,6 +408,8 @@
             myCharts.forEach(c => c.destroy());
             myCharts = [];
 
+            if(currentData.length === 0) return; // Jangan render chart jika data kosong
+
             const ctxStatus = document.getElementById('chart-status').getContext('2d');
             const counts = [
                 currentData.filter(p => getKategori(getIntegrasiScore(p)) === 'rendah').length,
@@ -427,6 +466,11 @@
             let content = "";
             let fileName = `SI_PEKA_Laporan_${date}`;
 
+            if(currentData.length === 0) {
+                alert("Tidak ada data untuk diekspor pada tanggal ini.");
+                return;
+            }
+
             if(type === 'csv') {
                 content = "Nama,Role,WL,CS,BO,STS,Skor Total,Kategori\n";
                 currentData.forEach(p => {
@@ -460,7 +504,8 @@
             if(t === 'statistik') setTimeout(initCharts, 100);
         }
 
-        window.onload = generateMockData;
+        // Jalankan fetch saat web pertama kali di-load
+        window.onload = fetchSpreadsheetData;
     </script>
 </body>
 </html>
