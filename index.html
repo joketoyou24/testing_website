@@ -49,6 +49,8 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .tooltip-text b { color: #818cf8; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tooltip-text .label { color: #94a3b8; font-weight: 700; margin-top: 8px; display: block; border-top: 1px solid #334155; padding-top: 8px; }
+        .tooltip-text .desc { color: #cbd5e1; display: block; margin-top: 2px; }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
         .thought-container { position: absolute; top: -28px; left: 45px; z-index: 30; }
@@ -74,7 +76,6 @@
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-6">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div class="flex items-center gap-4">
@@ -100,7 +101,6 @@
             </nav>
         </header>
 
-        <!-- DASHBOARD VIEW -->
         <main id="dashboard" class="tab-content active">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
@@ -129,7 +129,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="officer-grid"></div>
         </main>
 
-        <!-- STATISTIK VIEW -->
         <section id="statistik" class="tab-content">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="stat-card">
@@ -154,7 +153,6 @@
             </div>
         </section>
 
-        <!-- EKSPOR VIEW -->
         <section id="admin" class="tab-content">
             <div class="max-w-2xl mx-auto bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100">
                 <div class="text-center mb-10">
@@ -232,7 +230,7 @@
                 });
             }
             
-            // FITUR URUTAN: Rendah (Hijau) ke Tinggi (Merah)
+            // FITUR URUTAN: Mengurutkan dari skor terendah (hijau) ke tertinggi (merah)
             currentData = raw.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
             
             updateSummary();
@@ -252,6 +250,14 @@
             document.getElementById('count-aman').innerText = counts.aman;
             document.getElementById('count-waspada').innerText = counts.waspada;
             document.getElementById('count-kritis').innerText = counts.kritis;
+        }
+
+        function handleDateChange() {
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
+            grid.classList.add('hidden');
+            loading.classList.remove('hidden');
+            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
         }
 
         function renderCards() {
@@ -294,33 +300,67 @@
                     </div>
 
                     <div class="mb-5">
+                        <div class="tooltip-container flex items-center gap-1.5 mb-2">
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200">Well-being Check-in</p>
+                            <div class="tooltip-text">
+                                <b>Well-being Check-in</b>
+                                Instrumen harian berbasis ProQOL untuk memantau kualitas hidup profesional pendamping dalam melayani korban.
+                            </div>
+                        </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">CS</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.cs}</p>
-                                <div class="tooltip-text"><b>CS:</b> Compassion Satisfaction</div>
+                                <div class="tooltip-text">
+                                    <b>Compassion Satisfaction</b>
+                                    Kepuasan yang berasal dari kemampuan memberikan bantuan secara efektif kepada orang lain.
+                                    <span class="label">SKOR ${p.cs}: ${getProQOLCat(p.cs)}</span>
+                                    <span class="desc">Interpretasi: Menunjukkan kepuasan profesional dan efikasi diri yang baik dalam pekerjaan pendampingan.</span>
+                                </div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">BO</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.bo}</p>
-                                <div class="tooltip-text"><b>BO:</b> Burnout</div>
+                                <div class="tooltip-text">
+                                    <b>Burnout</b>
+                                    Kelelahan emosional dan fisik yang terkait dengan beban kerja dan lingkungan kerja yang dirasakan tidak efektif.
+                                    <span class="label">SKOR ${p.bo}: ${getProQOLCat(p.bo)}</span>
+                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan risiko kelelahan dan penurunan motivasi kerja.</span>
+                                </div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">STS</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.sts}</p>
-                                <div class="tooltip-text"><b>STS:</b> Secondary Traumatic Stress</div>
+                                <div class="tooltip-text">
+                                    <b>Secondary Traumatic Stress</b>
+                                    Ketegangan emosional akibat terpapar secara sekunder terhadap kejadian traumatis yang dialami oleh korban.
+                                    <span class="label">SKOR ${p.sts}: ${getProQOLCat(p.sts)}</span>
+                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan dampak psikologis akibat mendengarkan/menangani kisah trauma korban.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-auto pt-5 border-t border-slate-50">
                         <div class="flex justify-between items-center mb-2">
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Beban Kerja</p>
+                            <div class="tooltip-container">
+                                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200 inline-block">Beban Kerja Aktif</p>
+                                <div class="tooltip-text">
+                                    <b>Beban Kerja Aktif</b>
+                                    Penghitungan beban kerja berdasarkan 3 kriteria penilaian: Jenis Kasus, Kategori Kedalaman Layanan, dan Tingkat Risiko Kasus.
+                                </div>
+                            </div>
                             <p class="text-xl font-black text-indigo-600 leading-none">${p.wl}</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <div class="bg-indigo-50/50 p-2 rounded-xl text-center"><p class="text-xs font-black text-indigo-700">${p.act}</p></div>
-                            <div class="bg-slate-50 p-2 rounded-xl text-center"><p class="text-xs font-black text-slate-700">${p.term}</p></div>
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <div class="bg-indigo-50/50 p-2 rounded-xl text-center">
+                                <p class="text-[7px] font-bold text-indigo-400 uppercase">Kasus Aktif</p>
+                                <p class="text-xs font-black text-indigo-700">${p.act}</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-xl text-center">
+                                <p class="text-[7px] font-bold text-slate-400 uppercase">Terminasi</p>
+                                <p class="text-xs font-black text-slate-700">${p.term}</p>
+                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -410,14 +450,6 @@
             a.href = url;
             a.download = fileName;
             a.click();
-        }
-
-        function handleDateChange() {
-            const grid = document.getElementById('officer-grid');
-            const loading = document.getElementById('loading-view');
-            grid.classList.add('hidden');
-            loading.classList.remove('hidden');
-            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
         }
 
         function showTab(t) {
