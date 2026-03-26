@@ -49,8 +49,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .tooltip-text b { color: #818cf8; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .tooltip-text .label { color: #94a3b8; font-weight: 700; margin-top: 8px; display: block; border-top: 1px solid #334155; padding-top: 8px; }
-        .tooltip-text .desc { color: #cbd5e1; display: block; margin-top: 2px; }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
         .thought-container { position: absolute; top: -28px; left: 45px; z-index: 30; }
@@ -67,6 +65,10 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .nav-active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        .stat-card {
+            background: white; border-radius: 2rem; border: 1px solid #f1f5f9; padding: 2rem;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -127,8 +129,76 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="officer-grid"></div>
         </main>
 
-        <section id="statistik" class="tab-content"></section>
-        <section id="admin" class="tab-content"></section>
+        <!-- STATISTIK VIEW -->
+        <section id="statistik" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="stat-card">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Distribusi Status Pendamping</h3>
+                    <div class="relative h-64">
+                        <canvas id="chart-status"></canvas>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Top 5 Beban Kerja Tertinggi</h3>
+                    <div class="relative h-64">
+                        <canvas id="chart-workload"></canvas>
+                    </div>
+                </div>
+                <div class="stat-card lg:col-span-2">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Analisis Tren Well-being vs Workload</h3>
+                    <p class="text-[10px] text-slate-400 mb-6">Grafik ini membandingkan rata-rata Kepuasan (CS) dengan Beban Kerja (WL) seluruh staf.</p>
+                    <div class="relative h-80">
+                        <canvas id="chart-radar"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EKSPOR VIEW -->
+        <section id="admin" class="tab-content">
+            <div class="max-w-2xl mx-auto bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100">
+                <div class="text-center mb-10">
+                    <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                        <i class="fa-solid fa-file-export"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-800">Pusat Ekspor Data</h2>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Unduh Laporan Monitoring Berkala</p>
+                </div>
+
+                <div class="space-y-4">
+                    <button onclick="exportData('csv')" class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-[2rem] transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-file-csv text-2xl"></i>
+                            <div class="text-left">
+                                <p class="text-sm font-black uppercase">Ekspor ke CSV/Excel</p>
+                                <p class="text-[10px] opacity-60 font-bold">Data mentah untuk pengolahan lanjut</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
+                    </button>
+
+                    <button onclick="exportData('txt')" class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-emerald-600 hover:text-white rounded-[2rem] transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-file-lines text-2xl"></i>
+                            <div class="text-left">
+                                <p class="text-sm font-black uppercase">Ringkasan Laporan (TXT)</p>
+                                <p class="text-[10px] opacity-60 font-bold">Laporan naratif singkat status petugas</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
+                    </button>
+                </div>
+
+                <div class="mt-12 p-6 bg-amber-50 rounded-3xl border border-amber-100">
+                    <p class="text-[10px] font-black text-amber-700 uppercase mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info"></i> Catatan Keamanan
+                    </p>
+                    <p class="text-[11px] text-amber-600 leading-relaxed font-medium">
+                        Pastikan data yang diunduh dijaga kerahasiaannya sesuai dengan protokol privasi UPTD PPA Makassar. Data ini hanya untuk keperluan monitoring internal.
+                    </p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -140,6 +210,7 @@
         const getStatusText = (cat) => (cat === "tinggi" ? "Perlu Atensi 🆘" : cat === "sedang" ? "Cukup Sibuk ☕" : "Aman ji ✨");
 
         let currentData = [];
+        let myCharts = [];
 
         function generateMockData() {
             const raw = [
@@ -160,9 +231,13 @@
                     term: Math.floor(Math.random() * 40) + 10
                 });
             }
+            
+            // FITUR URUTAN: Rendah (Hijau) ke Tinggi (Merah)
             currentData = raw.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
+            
             updateSummary();
             renderCards();
+            initCharts();
         }
 
         function updateSummary() {
@@ -177,14 +252,6 @@
             document.getElementById('count-aman').innerText = counts.aman;
             document.getElementById('count-waspada').innerText = counts.waspada;
             document.getElementById('count-kritis').innerText = counts.kritis;
-        }
-
-        function handleDateChange() {
-            const grid = document.getElementById('officer-grid');
-            const loading = document.getElementById('loading-view');
-            grid.classList.add('hidden');
-            loading.classList.remove('hidden');
-            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
         }
 
         function renderCards() {
@@ -203,7 +270,7 @@
                                 <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${p.n}">
                             </div>
                             <div class="thought-container">
-                                <div class="thought-bubble" style="${kategori === 'tinggi' ? 'background: #ef4444;' : ''}">
+                                <div class="thought-bubble" style="${kategori === 'tinggi' ? 'background: #ef4444;' : kategori === 'sedang' ? 'background: #f59e0b;' : 'background: #10b981;'}">
                                     ${getStatusText(kategori)}
                                 </div>
                             </div>
@@ -216,7 +283,7 @@
                                     Penjelasan total skor itu integrasi well-being check in dan beban kerja aktif petugas pendamping kasus.
                                 </div>
                             </div>
-                            <p class="text-2xl font-black ${kategori === 'tinggi' ? 'text-red-600' : 'text-slate-800'}">${totalSkor.toFixed(0)}</p>
+                            <p class="text-2xl font-black ${kategori === 'tinggi' ? 'text-red-600' : kategori === 'sedang' ? 'text-amber-600' : 'text-green-600'}">${totalSkor.toFixed(0)}</p>
                             <div class="inline-block text-[8px] font-black px-2 py-0.5 rounded-full ${catLabelClass} uppercase mt-1">${kategori}</div>
                         </div>
                     </div>
@@ -226,74 +293,131 @@
                         <p class="text-[9px] text-slate-400 font-black tracking-widest uppercase mt-1">${p.r}</p>
                     </div>
 
-                    <!-- WELL-BEING SECTION -->
                     <div class="mb-5">
-                        <div class="tooltip-container flex items-center gap-1.5 mb-2">
-                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200">Well-being Check-in</p>
-                            <div class="tooltip-text">
-                                <b>Well-being Check-in</b>
-                                Instrumen harian berbasis ProQOL untuk memantau kualitas hidup profesional pendamping dalam melayani korban.
-                            </div>
-                        </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">CS</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.cs}</p>
-                                <div class="tooltip-text">
-                                    <b>Compassion Satisfaction</b>
-                                    Kepuasan yang berasal dari kemampuan memberikan bantuan secara efektif kepada orang lain.
-                                    <span class="label">SKOR ${p.cs}: ${getProQOLCat(p.cs)}</span>
-                                    <span class="desc">Interpretasi: Menunjukkan kepuasan profesional dan efikasi diri yang baik dalam pekerjaan pendampingan.</span>
-                                </div>
+                                <div class="tooltip-text"><b>CS:</b> Compassion Satisfaction</div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">BO</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.bo}</p>
-                                <div class="tooltip-text">
-                                    <b>Burnout</b>
-                                    Kelelahan emosional dan fisik yang terkait dengan beban kerja dan lingkungan kerja yang dirasakan tidak efektif.
-                                    <span class="label">SKOR ${p.bo}: ${getProQOLCat(p.bo)}</span>
-                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan risiko kelelahan dan penurunan motivasi kerja.</span>
-                                </div>
+                                <div class="tooltip-text"><b>BO:</b> Burnout</div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
                                 <p class="text-[7px] font-black text-slate-400 uppercase">STS</p>
                                 <p class="text-[12px] font-black text-slate-600">${p.sts}</p>
-                                <div class="tooltip-text">
-                                    <b>Secondary Traumatic Stress</b>
-                                    Ketegangan emosional akibat terpapar secara sekunder terhadap kejadian traumatis yang dialami oleh korban.
-                                    <span class="label">SKOR ${p.sts}: ${getProQOLCat(p.sts)}</span>
-                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan dampak psikologis akibat mendengarkan/menangani kisah trauma korban.</span>
-                                </div>
+                                <div class="tooltip-text"><b>STS:</b> Secondary Traumatic Stress</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- WORKLOAD SECTION -->
                     <div class="mt-auto pt-5 border-t border-slate-50">
                         <div class="flex justify-between items-center mb-2">
-                            <div class="tooltip-container">
-                                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200 inline-block">Beban Kerja Aktif</p>
-                                <div class="tooltip-text">
-                                    <b>Beban Kerja Aktif</b>
-                                    Penghitungan beban kerja berdasarkan 3 kriteria penilaian: Jenis Kasus, Kategori Kedalaman Layanan, dan Tingkat Risiko Kasus.
-                                </div>
-                            </div>
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Beban Kerja</p>
                             <p class="text-xl font-black text-indigo-600 leading-none">${p.wl}</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mt-4">
-                            <div class="bg-indigo-50/50 p-2 rounded-xl text-center">
-                                <p class="text-[7px] font-bold text-indigo-400 uppercase">Kasus Aktif</p>
-                                <p class="text-xs font-black text-indigo-700">${p.act}</p>
-                            </div>
-                            <div class="bg-slate-50 p-2 rounded-xl text-center">
-                                <p class="text-[7px] font-bold text-slate-400 uppercase">Terminasi</p>
-                                <p class="text-xs font-black text-slate-700">${p.term}</p>
-                            </div>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="bg-indigo-50/50 p-2 rounded-xl text-center"><p class="text-xs font-black text-indigo-700">${p.act}</p></div>
+                            <div class="bg-slate-50 p-2 rounded-xl text-center"><p class="text-xs font-black text-slate-700">${p.term}</p></div>
                         </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function initCharts() {
+            myCharts.forEach(c => c.destroy());
+            myCharts = [];
+
+            const ctxStatus = document.getElementById('chart-status').getContext('2d');
+            const counts = [
+                currentData.filter(p => getKategori(getIntegrasiScore(p)) === 'rendah').length,
+                currentData.filter(p => getKategori(getIntegrasiScore(p)) === 'sedang').length,
+                currentData.filter(p => getKategori(getIntegrasiScore(p)) === 'tinggi').length
+            ];
+
+            myCharts.push(new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aman', 'Waspada', 'Kritis'],
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold', size: 10 } } } } }
+            }));
+
+            const top5 = [...currentData].sort((a,b) => b.wl - a.wl).slice(0, 5);
+            const ctxWorkload = document.getElementById('chart-workload').getContext('2d');
+            myCharts.push(new Chart(ctxWorkload, {
+                type: 'bar',
+                data: {
+                    labels: top5.map(p => p.n.split(' ')[0]),
+                    datasets: [{
+                        label: 'Skor Beban',
+                        data: top5.map(p => p.wl),
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 10
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            }));
+
+            const ctxRadar = document.getElementById('chart-radar').getContext('2d');
+            myCharts.push(new Chart(ctxRadar, {
+                type: 'line',
+                data: {
+                    labels: currentData.map(p => p.n.split(' ')[0]),
+                    datasets: [
+                        { label: 'Beban Kerja (WL)', data: currentData.map(p => p.wl), borderColor: '#4f46e5', tension: 0.4 },
+                        { label: 'Kepuasan (CS)', data: currentData.map(p => p.cs), borderColor: '#10b981', tension: 0.4 }
+                    ]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            }));
+        }
+
+        function exportData(type) {
+            const date = document.getElementById('data-date').value;
+            let content = "";
+            let fileName = `SI_PEKA_Laporan_${date}`;
+
+            if(type === 'csv') {
+                content = "Nama,Role,WL,CS,BO,STS,Skor Total,Kategori\n";
+                currentData.forEach(p => {
+                    const score = getIntegrasiScore(p);
+                    content += `${p.n},${p.r},${p.wl},${p.cs},${p.bo},${p.sts},${score.toFixed(2)},${getKategori(score)}\n`;
+                });
+                fileName += ".csv";
+            } else {
+                content = `LAPORAN MONITORING SI PEKA - ${date}\n`;
+                content += `====================================\n\n`;
+                currentData.forEach(p => {
+                    const score = getIntegrasiScore(p);
+                    content += `Petugas: ${p.n} (${p.r})\nStatus: ${getStatusText(getKategori(score))}\nSkor Integrasi: ${score.toFixed(0)}\n\n`;
+                });
+                fileName += ".txt";
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        }
+
+        function handleDateChange() {
+            const grid = document.getElementById('officer-grid');
+            const loading = document.getElementById('loading-view');
+            grid.classList.add('hidden');
+            loading.classList.remove('hidden');
+            setTimeout(() => { generateMockData(); grid.classList.remove('hidden'); loading.classList.add('hidden'); }, 600);
         }
 
         function showTab(t) {
@@ -301,6 +425,7 @@
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active', 'text-slate-500'));
             document.getElementById(t).classList.add('active');
             document.getElementById('btn-'+t).classList.add('nav-active');
+            if(t === 'statistik') setTimeout(initCharts, 100);
         }
 
         window.onload = generateMockData;
