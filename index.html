@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
+        
         :root {
             --bg-main: #f8fafc;
             --primary: #4f46e5;
@@ -32,218 +31,74 @@
             position: relative;
         }
 
-        .card-pulse-green {
-            border: 2.5px solid var(--success) !important;
-            animation: pulse-green-frame 2s infinite;
-        }
+        .card-pulse-green { border: 2.5px solid var(--success) !important; animation: pulse-green-frame 2s infinite; }
+        .card-pulse-amber { border: 2.5px solid var(--warning) !important; animation: pulse-amber-frame 2s infinite; }
+        .card-pulse-red { border: 2.5px solid var(--danger) !important; animation: pulse-red-frame 1.5s infinite; }
 
-        .card-pulse-amber {
-            border: 2.5px solid var(--warning) !important;
-            animation: pulse-amber-frame 2s infinite;
-        }
+        @keyframes pulse-green-frame { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes pulse-amber-frame { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        @keyframes pulse-red-frame { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-        .card-pulse-red {
-            border: 2.5px solid var(--danger) !important;
-            animation: pulse-red-frame 1.5s infinite;
-        }
-
-        @keyframes pulse-green-frame {
-            0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-            }
-        }
-
-        @keyframes pulse-amber-frame {
-            0% {
-                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(245, 158, 11, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-            }
-        }
-
-        @keyframes pulse-red-frame {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
-            }
-
-            70% {
-                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
-        }
-
-        .tooltip-container {
-            position: relative;
-            cursor: help;
-        }
-
+        .tooltip-container { position: relative; cursor: help; }
         .tooltip-text {
-            visibility: hidden;
-            width: 240px;
-            background-color: #1e293b;
-            color: #fff;
-            text-align: left;
-            border-radius: 12px;
-            padding: 14px;
-            position: absolute;
-            z-index: 100;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 10px;
-            line-height: 1.5;
-            font-weight: 500;
-            pointer-events: none;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            visibility: hidden; width: 240px; background-color: #1e293b; color: #fff;
+            text-align: left; border-radius: 12px; padding: 14px; position: absolute;
+            z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%);
+            opacity: 0; transition: opacity 0.3s; font-size: 10px; line-height: 1.5;
+            font-weight: 500; pointer-events: none; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .tooltip-text b { color: #818cf8; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tooltip-text .label { color: #94a3b8; font-weight: 700; margin-top: 8px; display: block; border-top: 1px solid #334155; padding-top: 8px; }
+        .tooltip-text .desc { color: #cbd5e1; display: block; margin-top: 2px; }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-        .tooltip-text b {
-            color: #818cf8;
-            display: block;
-            margin-bottom: 6px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tooltip-text .label {
-            color: #94a3b8;
-            font-weight: 700;
-            margin-top: 8px;
-            display: block;
-            border-top: 1px solid #334155;
-            padding-top: 8px;
-        }
-
-        .tooltip-text .desc {
-            color: #cbd5e1;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .tooltip-container:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .thought-container {
-            position: absolute;
-            top: -28px;
-            left: 45px;
-            z-index: 30;
-        }
-
+        .thought-container { position: absolute; top: -28px; left: 45px; z-index: 30; }
         .thought-bubble {
-            background: #1e293b;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
+            background: #1e293b; color: white; padding: 6px 14px;
+            border-radius: 12px; font-size: 10px; font-weight: 700;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); position: relative;
             white-space: nowrap;
         }
+        .thought-bubble::after { content: ''; position: absolute; background: #1e293b; border-radius: 50%; width: 6px; height: 6px; bottom: -8px; left: 12px; }
 
-        .thought-bubble::after {
-            content: '';
-            position: absolute;
-            background: #1e293b;
-            border-radius: 50%;
-            width: 6px;
-            height: 6px;
-            bottom: -8px;
-            left: 12px;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .nav-active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 2rem;
-            border: 1px solid #f1f5f9;
-            padding: 2rem;
-        }
+        .stat-card { background: white; border-radius: 2rem; border: 1px solid #f1f5f9; padding: 2rem; }
     </style>
 </head>
-
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-6">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div class="flex items-center gap-4">
-                    <div
-                        class="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-2xl rotate-3">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-2xl rotate-3">
                         <i class="fa-solid fa-notes-medical text-2xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">SI PEKA <span
-                                class="text-indigo-600">UPTD PPA</span></h1>
-                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Monitoring
-                            Pendamping Kasus • Makassar</p>
+                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">SI PEKA <span class="text-indigo-600">UPTD PPA</span></h1>
+                        <p id="data-indicator" class="text-indigo-500 text-[10px] font-black uppercase tracking-[0.2em] bg-indigo-50 inline-block px-2 py-0.5 rounded-full mt-1">Status: Memuat Data...</p>
                     </div>
                 </div>
-
-                <div class="flex flex-col bg-white border border-slate-200 rounded-2xl p-2 px-4 shadow-sm">
-                    <label class="text-[8px] font-black text-slate-400 uppercase mb-1">Pilih Tanggal Data</label>
-                    <input type="date" id="data-date" onchange="handleDateChange()"
-                        class="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer">
+                
+                <div class="flex flex-col bg-white border border-slate-200 rounded-2xl p-2 px-4 shadow-sm min-w-[200px]">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-[8px] font-black text-slate-400 uppercase">Lihat Riwayat</label>
+                        <button onclick="resetToUtama()" id="btn-reset" class="text-[8px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors hidden"><i class="fa-solid fa-rotate-left"></i> Reset ke Utama</button>
+                    </div>
+                    <input type="date" id="data-date" onchange="handleDateChange()" class="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer">
                 </div>
             </div>
 
             <nav class="flex p-1.5 bg-slate-200/50 rounded-[1.5rem] backdrop-blur-sm">
-                <button onclick="showTab('dashboard')" id="btn-dashboard"
-                    class="nav-btn nav-active px-8 py-3 rounded-2xl text-[11px] font-black transition-all">DASHBOARD</button>
-                <button onclick="showTab('statistik')" id="btn-statistik"
-                    class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">STATISTIK</button>
-                <button onclick="showTab('admin')" id="btn-admin"
-                    class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">EKSPOR</button>
+                <button onclick="showTab('dashboard')" id="btn-dashboard" class="nav-btn nav-active px-8 py-3 rounded-2xl text-[11px] font-black transition-all">DASHBOARD</button>
+                <button onclick="showTab('statistik')" id="btn-statistik" class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">STATISTIK</button>
+                <button onclick="showTab('admin')" id="btn-admin" class="nav-btn px-8 py-3 rounded-2xl text-[11px] font-black text-slate-500 transition-all">EKSPOR</button>
             </nav>
         </header>
 
@@ -253,18 +108,15 @@
                     <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Total Pendamping</p>
                     <p id="count-total" class="text-3xl font-black text-slate-800 tracking-tighter">0</p>
                 </div>
-                <div
-                    class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-green-500">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-green-500">
                     <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Aman</p>
                     <p id="count-aman" class="text-3xl font-black text-green-600 tracking-tighter">0</p>
                 </div>
-                <div
-                    class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-amber-500">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-amber-500">
                     <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Waspada</p>
                     <p id="count-waspada" class="text-3xl font-black text-amber-600 tracking-tighter">0</p>
                 </div>
-                <div
-                    class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-red-500">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-[6px] border-l-red-500">
                     <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Kritis</p>
                     <p id="count-kritis" class="text-3xl font-black text-red-600 tracking-tighter">0</p>
                 </div>
@@ -272,7 +124,7 @@
 
             <div id="loading-view" class="hidden flex flex-col items-center justify-center py-20 text-slate-400">
                 <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4"></i>
-                <p class="text-xs font-black uppercase tracking-widest">Sinkronisasi Data History...</p>
+                <p class="text-xs font-black uppercase tracking-widest">Memuat Data...</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="officer-grid"></div>
@@ -281,24 +133,20 @@
         <section id="statistik" class="tab-content">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="stat-card">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Distribusi Status
-                        Pendamping</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Distribusi Status Pendamping</h3>
                     <div class="relative h-64">
                         <canvas id="chart-status"></canvas>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Top 5 Beban Kerja
-                        Tertinggi</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Top 5 Beban Kerja Tertinggi</h3>
                     <div class="relative h-64">
                         <canvas id="chart-workload"></canvas>
                     </div>
                 </div>
                 <div class="stat-card lg:col-span-2">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Analisis Tren
-                        Well-being vs Workload</h3>
-                    <p class="text-[10px] text-slate-400 mb-6">Grafik ini membandingkan rata-rata Kepuasan (CS) dengan
-                        Beban Kerja (WL) seluruh staf.</p>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Analisis Tren Well-being vs Workload</h3>
+                    <p class="text-[10px] text-slate-400 mb-6">Grafik ini membandingkan rata-rata Kepuasan (CS) dengan Beban Kerja (WL) seluruh staf.</p>
                     <div class="relative h-80">
                         <canvas id="chart-radar"></canvas>
                     </div>
@@ -309,18 +157,15 @@
         <section id="admin" class="tab-content">
             <div class="max-w-2xl mx-auto bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100">
                 <div class="text-center mb-10">
-                    <div
-                        class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
                         <i class="fa-solid fa-file-export"></i>
                     </div>
                     <h2 class="text-2xl font-black text-slate-800">Pusat Ekspor Data</h2>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Unduh Laporan Monitoring
-                        Berkala</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Unduh Laporan Monitoring Berkala</p>
                 </div>
 
                 <div class="space-y-4">
-                    <button onclick="exportData('csv')"
-                        class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-[2rem] transition-all group">
+                    <button onclick="exportData('csv')" class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-[2rem] transition-all group">
                         <div class="flex items-center gap-4">
                             <i class="fa-solid fa-file-csv text-2xl"></i>
                             <div class="text-left">
@@ -331,8 +176,7 @@
                         <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
                     </button>
 
-                    <button onclick="exportData('txt')"
-                        class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-emerald-600 hover:text-white rounded-[2rem] transition-all group">
+                    <button onclick="exportData('txt')" class="w-full flex items-center justify-between p-6 bg-slate-50 hover:bg-emerald-600 hover:text-white rounded-[2rem] transition-all group">
                         <div class="flex items-center gap-4">
                             <i class="fa-solid fa-file-lines text-2xl"></i>
                             <div class="text-left">
@@ -343,16 +187,6 @@
                         <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
                     </button>
                 </div>
-
-                <div class="mt-12 p-6 bg-amber-50 rounded-3xl border border-amber-100">
-                    <p class="text-[10px] font-black text-amber-700 uppercase mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info"></i> Catatan Keamanan
-                    </p>
-                    <p class="text-[11px] text-amber-600 leading-relaxed font-medium">
-                        Pastikan data yang diunduh dijaga kerahasiaannya sesuai dengan protokol privasi UPTD PPA
-                        Makassar. Data ini hanya untuk keperluan monitoring internal.
-                    </p>
-                </div>
             </div>
         </section>
     </div>
@@ -362,69 +196,99 @@
         const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwUuTTpor5mD1UXcCPEbNhHm1ahRGHU78GVfPxIQbpdQdiGM8vde4F96wBM5nUv3__e/exec';
         // -----------------------
 
-        document.getElementById('data-date').valueAsDate = new Date();
-
         const getIntegrasiScore = (p) => (p.wl * 1.2) + (p.bo + p.sts);
         const getKategori = (score) => (score > 40 ? "tinggi" : score > 20 ? "sedang" : "rendah");
         const getProQOLCat = (val) => (val >= 11 ? "Tinggi" : val >= 6 ? "Sedang" : "Rendah");
         const getStatusText = (cat) => (cat === "tinggi" ? "Perlu Atensi 🆘" : cat === "sedang" ? "Cukup Sibuk ☕" : "Aman ji ✨");
 
-        let allData = [];
+        let dataUtama = [];
+        let dataRiwayat = [];
         let currentData = [];
         let myCharts = [];
 
         async function fetchSpreadsheetData() {
             const grid = document.getElementById('officer-grid');
             const loading = document.getElementById('loading-view');
-
+            
             grid.classList.add('hidden');
             loading.classList.remove('hidden');
 
             try {
                 const response = await fetch(SPREADSHEET_API_URL);
-                if (!response.ok) throw new Error("Gagal terhubung ke API");
-
-                allData = await response.json();
-                processFilteredData(); // Langsung filter setelah data didapat
+                if (!response.ok) throw new Error("Gagal terhubung ke jaringan");
+                
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                // Simpan data ke memori
+                dataUtama = data.utama;
+                dataRiwayat = data.riwayat;
+                
+                // Tampilkan data utama (default)
+                resetToUtama();
             } catch (error) {
-                console.error("Error fetching data:", error);
-                alert("Gagal mengambil data dari Spreadsheet. Pastikan URL API sudah benar.");
+                console.error("Error:", error);
                 loading.classList.add('hidden');
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-500 font-bold bg-red-50 rounded-3xl border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-2 text-2xl"></i><br>Gagal mengambil data.<br><span class="text-xs font-normal text-red-400">${error.message}</span></div>`;
+                grid.classList.remove('hidden');
+                document.getElementById('data-indicator').innerText = "Status: Error Konesksi";
             }
         }
 
-        function processFilteredData() {
-            const grid = document.getElementById('officer-grid');
-            const loading = document.getElementById('loading-view');
-
-            // Karena kolom tanggal dihapus, kita langsung tampilkan semua data dari Spreadsheet
-            let filtered = [...allData];
-
-            // Urutkan dari skor terendah (hijau) ke tertinggi (merah)
-            currentData = filtered.sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
-
-            updateSummary();
-            renderCards();
-
-            if (document.getElementById('statistik').classList.contains('active')) {
-                initCharts();
-            }
-
-            loading.classList.add('hidden');
-            grid.classList.remove('hidden');
+        // Fungsi untuk me-reset tampilan ke Sheet "D"
+        function resetToUtama() {
+            document.getElementById('data-date').value = ""; // Kosongkan input kalender
+            document.getElementById('btn-reset').classList.add('hidden');
+            document.getElementById('data-indicator').innerHTML = "Menampilkan: <b class='text-indigo-600'>Data Utama (Saat Ini)</b>";
+            
+            // Render data dari Sheet D
+            processDataForRender(dataUtama);
         }
 
+        // Fungsi yang dipanggil saat user memilih tanggal kalender
         function handleDateChange() {
-            // Ketika kalender diganti, langsung proses ulang data yang sudah di-fetch
+            const selectedDate = document.getElementById('data-date').value;
+            if(!selectedDate) {
+                resetToUtama();
+                return;
+            }
+
+            document.getElementById('btn-reset').classList.remove('hidden');
+            document.getElementById('data-indicator').innerHTML = `Menampilkan: <b class='text-amber-600'>Riwayat (${selectedDate})</b>`;
+            
+            // Filter array dataRiwayat berdasarkan tanggal terpilih
+            let filtered = dataRiwayat.filter(item => {
+                if (!item.tanggal) return false;
+                const itemDateOnly = item.tanggal.substring(0, 10);
+                return itemDateOnly === selectedDate;
+            });
+            
+            processDataForRender(filtered);
+        }
+
+        // Fungsi global untuk memproses array data, mengurutkan, dan merender
+        function processDataForRender(dataArray) {
             const grid = document.getElementById('officer-grid');
             const loading = document.getElementById('loading-view');
-
+            
             grid.classList.add('hidden');
             loading.classList.remove('hidden');
 
             setTimeout(() => {
-                processFilteredData();
-            }, 300); // Sedikit delay agar animasi loading terlihat natural
+                // Urutkan dari skor terendah (hijau) ke tertinggi (merah)
+                currentData = [...dataArray].sort((a, b) => getIntegrasiScore(a) - getIntegrasiScore(b));
+                
+                updateSummary();
+                renderCards();
+                
+                if (document.getElementById('statistik').classList.contains('active')) {
+                    initCharts();
+                }
+                
+                loading.classList.add('hidden');
+                grid.classList.remove('hidden');
+            }, 300);
         }
 
         function updateSummary() {
@@ -443,9 +307,9 @@
 
         function renderCards() {
             const grid = document.getElementById('officer-grid');
-
+            
             if (currentData.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 font-bold">Tidak ada data untuk tanggal ini.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 font-bold bg-slate-50 rounded-3xl border border-dashed border-slate-200"><i class="fa-solid fa-inbox mb-2 text-2xl opacity-50"></i><br>Tidak ada data monitoring.</div>`;
                 return;
             }
 
@@ -489,10 +353,6 @@
                     <div class="mb-5">
                         <div class="tooltip-container flex items-center gap-1.5 mb-2">
                             <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200">Well-being Check-in</p>
-                            <div class="tooltip-text">
-                                <b>Well-being Check-in</b>
-                                Instrumen harian berbasis ProQOL untuk memantau kualitas hidup profesional pendamping dalam melayani korban.
-                            </div>
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
@@ -500,9 +360,8 @@
                                 <p class="text-[12px] font-black text-slate-600">${p.cs}</p>
                                 <div class="tooltip-text">
                                     <b>Compassion Satisfaction</b>
-                                    Kepuasan yang berasal dari kemampuan memberikan bantuan secara efektif kepada orang lain.
+                                    Kepuasan yang berasal dari kemampuan memberikan bantuan secara efektif.
                                     <span class="label">SKOR ${p.cs}: ${getProQOLCat(p.cs)}</span>
-                                    <span class="desc">Interpretasi: Menunjukkan kepuasan profesional dan efikasi diri yang baik dalam pekerjaan pendampingan.</span>
                                 </div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
@@ -510,9 +369,8 @@
                                 <p class="text-[12px] font-black text-slate-600">${p.bo}</p>
                                 <div class="tooltip-text">
                                     <b>Burnout</b>
-                                    Kelelahan emosional dan fisik yang terkait dengan beban kerja dan lingkungan kerja yang dirasakan tidak efektif.
+                                    Kelelahan emosional dan fisik yang terkait dengan beban kerja.
                                     <span class="label">SKOR ${p.bo}: ${getProQOLCat(p.bo)}</span>
-                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan risiko kelelahan dan penurunan motivasi kerja.</span>
                                 </div>
                             </div>
                             <div class="text-center p-2 rounded-2xl bg-slate-50 border border-slate-100 tooltip-container">
@@ -520,9 +378,8 @@
                                 <p class="text-[12px] font-black text-slate-600">${p.sts}</p>
                                 <div class="tooltip-text">
                                     <b>Secondary Traumatic Stress</b>
-                                    Ketegangan emosional akibat terpapar secara sekunder terhadap kejadian traumatis yang dialami oleh korban.
+                                    Ketegangan emosional akibat terpapar cerita trauma korban.
                                     <span class="label">SKOR ${p.sts}: ${getProQOLCat(p.sts)}</span>
-                                    <span class="desc">Interpretasi: Skor tinggi menunjukkan dampak psikologis akibat mendengarkan/menangani kisah trauma korban.</span>
                                 </div>
                             </div>
                         </div>
@@ -532,10 +389,6 @@
                         <div class="flex justify-between items-center mb-2">
                             <div class="tooltip-container">
                                 <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-dotted border-slate-200 inline-block">Beban Kerja Aktif</p>
-                                <div class="tooltip-text">
-                                    <b>Beban Kerja Aktif</b>
-                                    Penghitungan beban kerja berdasarkan 3 kriteria penilaian: Jenis Kasus, Kategori Kedalaman Layanan, dan Tingkat Risiko Kasus.
-                                </div>
                             </div>
                             <p class="text-xl font-black text-indigo-600 leading-none">${p.wl}</p>
                         </div>
@@ -558,7 +411,7 @@
             myCharts.forEach(c => c.destroy());
             myCharts = [];
 
-            if (currentData.length === 0) return; // Jangan render chart jika data kosong
+            if(currentData.length === 0) return;
 
             const ctxStatus = document.getElementById('chart-status').getContext('2d');
             const counts = [
@@ -581,7 +434,7 @@
                 options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold', size: 10 } } } } }
             }));
 
-            const top5 = [...currentData].sort((a, b) => b.wl - a.wl).slice(0, 5);
+            const top5 = [...currentData].sort((a,b) => b.wl - a.wl).slice(0, 5);
             const ctxWorkload = document.getElementById('chart-workload').getContext('2d');
             myCharts.push(new Chart(ctxWorkload, {
                 type: 'bar',
@@ -612,24 +465,24 @@
         }
 
         function exportData(type) {
-            const date = document.getElementById('data-date').value;
+            let label = document.getElementById('data-date').value || "Utama";
             let content = "";
-            let fileName = `SI_PEKA_Laporan_${date}`;
+            let fileName = `SI_PEKA_Laporan_${label}`;
 
-            if (currentData.length === 0) {
-                alert("Tidak ada data untuk diekspor pada tanggal ini.");
+            if(currentData.length === 0) {
+                alert("Tidak ada data untuk diekspor.");
                 return;
             }
 
-            if (type === 'csv') {
-                content = "Nama,Role,WL,CS,BO,STS,Skor Total,Kategori\n";
+            if(type === 'csv') {
+                content = "Nama,Role,Kasus Aktif,Terminasi,Beban Kerja Aktif,CS,BO,STS,Skor Total,Kategori\n";
                 currentData.forEach(p => {
                     const score = getIntegrasiScore(p);
-                    content += `${p.n},${p.r},${p.wl},${p.cs},${p.bo},${p.sts},${score.toFixed(2)},${getKategori(score)}\n`;
+                    content += `${p.n},${p.r},${p.act},${p.term},${p.wl},${p.cs},${p.bo},${p.sts},${score.toFixed(2)},${getKategori(score)}\n`;
                 });
                 fileName += ".csv";
             } else {
-                content = `LAPORAN MONITORING SI PEKA - ${date}\n`;
+                content = `LAPORAN MONITORING SI PEKA - ${label}\n`;
                 content += `====================================\n\n`;
                 currentData.forEach(p => {
                     const score = getIntegrasiScore(p);
@@ -650,13 +503,11 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active', 'text-slate-500'));
             document.getElementById(t).classList.add('active');
-            document.getElementById('btn-' + t).classList.add('nav-active');
-            if (t === 'statistik') setTimeout(initCharts, 100);
+            document.getElementById('btn-'+t).classList.add('nav-active');
+            if(t === 'statistik') setTimeout(initCharts, 100);
         }
 
-        // Jalankan fetch saat web pertama kali di-load
         window.onload = fetchSpreadsheetData;
     </script>
 </body>
-
 </html>
